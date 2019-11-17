@@ -9,7 +9,7 @@ namespace BlazorDemo.Pages
         private readonly ILogger<IndexModel> _logger;
         private SessionState _state;
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = "";
 
         public IndexModel(ILogger<IndexModel> logger, SessionState state)
         {
