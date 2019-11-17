@@ -3,75 +3,148 @@
 
 @if (AllDirtyWords != null && AllDirtyWords.Count > 0)
 {
-    <button class="btn btn-primary" @onclick="AddAll">Add All</button><br />
-
-    @foreach (var word in AllDirtyWords)
+    <input id="CheckAll" type="checkbox" @onchange="((e) => CheckAll(e))" />
+    <label for="CheckAll">Check/Uncheck All</label>
+    <br />
+    foreach (var word in AllDirtyWords)
     {
-        <button class="btn btn-link" @onclick="(()=> AddWord(word))">Add</button> @word
+        @if (CheckedAllDirtyWords != null && CheckedAllDirtyWords.Contains(word))
+        {
+            <input id="@word" type="checkbox" checked="checked" @onchange="((e) => CheckChanged(e, word))" />
+        }
+        else
+        {
+            <input id="@word" type="checkbox" @onchange="((e) => CheckChanged(e, word))" />
+        }
+        <label for="@word">@word</label>
         <br />
     }
+    <button class="btn btn-primary" @onclick="AddChecked">Add Checked</button>
+    <br />
 }
 
 @if (SelectedDirtyWords != null && SelectedDirtyWords.Count > 0)
 {
-    <button class="btn btn-primary" @onclick="RemoveAll">Remove All</button><br />
+    <input id="CheckAllSelected" type="checkbox" @onchange="((e) => CheckAllSelected(e))" />
+    <label for="CheckAllSelected">Check/Uncheck All</label>
+    <br />
 
     @foreach (var word in SelectedDirtyWords)
     {
-        <button class="btn btn-link" @onclick="(()=> RemoveWord(word))">Remove</button> @word
+        @if (CheckedSelectedDirtyWords != null && CheckedSelectedDirtyWords.Contains(word))
+        {
+            <input id="@($"{word}_selected")" type="checkbox" checked="checked" @onchange="((e) => CheckChangedSelected(e, word))" />
+        }
+        else
+        {
+            <input id="@($"{word}_selected")" type="checkbox" @onchange="((e) => CheckChangedSelected(e, word))" />
+        }
+        <label for="@($"{word}_selected")">@word</label>
         <br />
     }
 }
 
-<input @bind="@NewWord" />
+<button class="btn btn-primary" @onclick="RemoveChecked">Removed Checked</button>
+<br />
 
+<input @bind="@NewWord" />
 <button class="btn btn-primary" @onclick="AddNewWord">Add</button>
 
 @code {
     [Parameter]
     public List<string> AllDirtyWords { get; set; }
+    List<string> CheckedAllDirtyWords { get; set; }
 
     List<string> SelectedDirtyWords { get; set; }
+    List<string> CheckedSelectedDirtyWords { get; set; }
 
     string NewWord { get; set; }
 
     [Parameter]
     public string UserId { get; set; }
 
-    void AddAll()
+    void CheckChangedSelected(ChangeEventArgs e, string key)
+    {
+        if (CheckedSelectedDirtyWords == null)
+        {
+            CheckedSelectedDirtyWords = new List<string>();
+        }
+
+        if ((bool)e.Value)
+        {
+            CheckedSelectedDirtyWords.Add(key);
+        }
+        else
+        {
+            CheckedSelectedDirtyWords.Remove(key);
+        }
+    }
+
+    void CheckChanged(ChangeEventArgs e, string key)
+    {
+        if (CheckedAllDirtyWords == null)
+        {
+            CheckedAllDirtyWords = new List<string>();
+        }
+
+        if ((bool)e.Value)
+        {
+            CheckedAllDirtyWords.Add(key);
+        }
+        else
+        {
+            CheckedAllDirtyWords.Remove(key);
+        }
+    }
+
+    void CheckAllSelected(ChangeEventArgs e)
+    {
+        if ((bool)e.Value)
+        {
+            CheckedSelectedDirtyWords = SelectedDirtyWords;
+        }
+        else
+        {
+            CheckedSelectedDirtyWords = new List<string>();
+        }
+    }
+
+    void CheckAll(ChangeEventArgs e)
+    {
+        if ((bool)e.Value)
+        {
+            CheckedAllDirtyWords = AllDirtyWords;
+        }
+        else
+        {
+            CheckedAllDirtyWords = new List<string>();
+        }
+    }
+
+    void RemoveChecked()
+    {
+        if (SelectedDirtyWords != null)
+        {
+            SelectedDirtyWords = SelectedDirtyWords.Except(CheckedSelectedDirtyWords).ToList();
+
+            state.SetDirtyWords(UserId, SelectedDirtyWords);
+
+            CheckedSelectedDirtyWords = new List<string>();
+        }
+    }
+
+    void AddChecked()
     {
         if (SelectedDirtyWords == null)
         {
             SelectedDirtyWords = new List<string>();
         }
 
-        SelectedDirtyWords = SelectedDirtyWords.Union(AllDirtyWords).Distinct().ToList();
-    }
-
-    void RemoveAll()
-    {
-        SelectedDirtyWords = new List<string>();
+        SelectedDirtyWords = SelectedDirtyWords.Union(CheckedAllDirtyWords).Distinct().ToList();
 
         state.SetDirtyWords(UserId, SelectedDirtyWords);
-    }
 
-    void RemoveWord(string word)
-    {
-        SelectedDirtyWords.Remove(word);
-
-        state.SetDirtyWords(UserId, SelectedDirtyWords);
-    }
-
-    void AddWord(string word)
-    {
-        if (SelectedDirtyWords == null)
-        {
-            SelectedDirtyWords = new List<string>();
-        }
-
-        SelectedDirtyWords.Add(word);
-
-        state.SetDirtyWords(UserId, SelectedDirtyWords);
+        CheckedAllDirtyWords = new List<string>();
     }
 
     void AddNewWord()
