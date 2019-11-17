@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Home page";
 }
+<form method="post">
+    <button type="submit">Post</button>
+</form>
 
-@*@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.Static, new { AllDirtyWords = new List<string> { "Foo", "Bar" } }))*@
-@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.ServerPrerendered))
+@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.Server, new { UserId = @Model.UserId, AllDirtyWords = new List<string> { "Foo", "Bar" } }))
+@*@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.ServerPrerendered))*@
