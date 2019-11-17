@@ -7,5 +7,5 @@
     <button type="submit">Post</button>
 </form>
 
-@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.Server, new { UserId = @Model.UserId, AllDirtyWords = new List<string> { "Foo", "Bar" }}))
+@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.Server, new { UserId = @Model.UserId, AllDirtyWords = @Model.AllDirtyWords}))
 @*@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.ServerPrerendered))*@
