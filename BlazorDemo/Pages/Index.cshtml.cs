@@ -21,7 +21,7 @@ namespace BlazorDemo.Pages
         {
         }
 
-        public async void OnPost()
+        public void OnPost()
         {
         }
     }
