@@ -1,0 +1,8 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@*@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.Static, new { AllDirtyWords = new List<string> { "Foo", "Bar" } }))*@
+@(await Html.RenderComponentAsync<DirtyWords>(RenderMode.ServerPrerendered))

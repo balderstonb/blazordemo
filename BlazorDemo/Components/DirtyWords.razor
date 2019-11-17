@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Components
+
+@if (AllDirtyWords != null)
+{
+        @foreach (var word in AllDirtyWords)
+        {
+            @word <button class="btn btn-danger" @onclick="(()=> RemoveWord(word))">Remove</button> <br />
+        }
+}
+else
+{
+    <div>No words</div>
+}
+
+
+<input @bind="@NewWord" />
+
+<button class="btn btn-primary" @onclick="AddWord">Add</button>
+
+@code {
+    [Parameter] public List<string> AllDirtyWords { get; set; }
+
+    string NewWord { get; set; }
+
+    void RemoveWord(string word)
+    {
+        AllDirtyWords.Remove(word);
+    }
+
+    void AddWord()
+    {
+        if (AllDirtyWords == null)
+        {
+            AllDirtyWords = new List<string>();
+        }
+
+        AllDirtyWords.Add(NewWord);
+    }
+}
