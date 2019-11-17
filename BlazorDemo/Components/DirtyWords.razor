@@ -3,46 +3,86 @@
 
 @if (AllDirtyWords != null && AllDirtyWords.Count > 0)
 {
+    <button class="btn btn-primary" @onclick="AddAll">Add All</button><br />
+
     @foreach (var word in AllDirtyWords)
     {
-        @word <button class="btn btn-danger" @onclick="(()=> RemoveWord(word))">Remove</button>
+        <button class="btn btn-link" @onclick="(()=> AddWord(word))">Add</button> @word
         <br />
     }
 }
-else
+
+@if (SelectedDirtyWords != null && SelectedDirtyWords.Count > 0)
 {
-    <div>No words</div>
+    <button class="btn btn-primary" @onclick="RemoveAll">Remove All</button><br />
+
+    @foreach (var word in SelectedDirtyWords)
+    {
+        <button class="btn btn-link" @onclick="(()=> RemoveWord(word))">Remove</button> @word
+        <br />
+    }
 }
 
 <input @bind="@NewWord" />
 
-<button class="btn btn-primary" @onclick="AddWord">Add</button>
+<button class="btn btn-primary" @onclick="AddNewWord">Add</button>
 
 @code {
     [Parameter]
     public List<string> AllDirtyWords { get; set; }
+
+    List<string> SelectedDirtyWords { get; set; }
 
     string NewWord { get; set; }
 
     [Parameter]
     public string UserId { get; set; }
 
-    void RemoveWord(string word)
+    void AddAll()
     {
-        AllDirtyWords.Remove(word);
-
-        state.SetDirtyWords(UserId, AllDirtyWords);
-    }
-
-    void AddWord()
-    {
-        if (AllDirtyWords == null)
+        if (SelectedDirtyWords == null)
         {
-            AllDirtyWords = new List<string>();
+            SelectedDirtyWords = new List<string>();
         }
 
-        AllDirtyWords.Add(NewWord);
+        SelectedDirtyWords = SelectedDirtyWords.Union(AllDirtyWords).Distinct().ToList();
+    }
 
-        state.SetDirtyWords(UserId, AllDirtyWords);
+    void RemoveAll()
+    {
+        SelectedDirtyWords = new List<string>();
+
+        state.SetDirtyWords(UserId, SelectedDirtyWords);
+    }
+
+    void RemoveWord(string word)
+    {
+        SelectedDirtyWords.Remove(word);
+
+        state.SetDirtyWords(UserId, SelectedDirtyWords);
+    }
+
+    void AddWord(string word)
+    {
+        if (SelectedDirtyWords == null)
+        {
+            SelectedDirtyWords = new List<string>();
+        }
+
+        SelectedDirtyWords.Add(word);
+
+        state.SetDirtyWords(UserId, SelectedDirtyWords);
+    }
+
+    void AddNewWord()
+    {
+        if (SelectedDirtyWords == null)
+        {
+            SelectedDirtyWords = new List<string>();
+        }
+
+        SelectedDirtyWords.Add(NewWord);
+
+        state.SetDirtyWords(UserId, SelectedDirtyWords);
     }
 }
